@@ -10,6 +10,7 @@ This application is designed to create a TrincollBot to answer question regardin
 
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+
 1. 
 ```
 node app.js  
@@ -30,9 +31,8 @@ docker run -d -p [any port you want]:2001 --name trincollbot trincollbot:0.0.3
 ### Prerequisites
 
 1. Ollama
--  [Download](https://ollama.com/download/Ollama-darwin.zip)
+ [Download](https://ollama.com/download/Ollama-darwin.zip)
 2. Ollama-js
-- 
 ```
 npm i ollama
 ```
