@@ -2,6 +2,7 @@
   "name": "trincollbot",
   "version": "1.0.0",
   "description": "the project aims to create a bot that's familiar with all kinds of Trincoll's school information",
+  "type": "module",
   "main": "app.js ",
   "scripts": {
     "start": "node app.js",
@@ -22,6 +23,7 @@
   "homepage": "https://github.com/JeffC996/TrincollBot#readme",
   "dependencies": {
     "express": "^4.18.2",
+    "ollama": "^0.4.9",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0"
   }

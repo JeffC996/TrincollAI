@@ -1,0 +1,42 @@
+# macOS system files
+.DS_Store
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Environment variables
+.env
+
+# Compiled binary addons (node-gyp)
+/build/
+
+# IDE-specific files
+.vscode/
+
+# macOS file metadata
+*.DS_Store
+
+# macOS Finder custom settings
+._*
+
+# Yarn integrity file
+.yarn-integrity
+
+# Production build output
+/dist
+
+# Debug logs
+npm-debug.log*
