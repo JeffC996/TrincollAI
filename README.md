@@ -16,6 +16,15 @@ node app.js
 ```
 2. http://localhost:2001/swagger
 
+### Docker
+1. 
+```
+docker build -t trincollbot:0.0.3 . 
+```
+2.
+```
+docker run -d -p [any port you want]:2001 --name trincollbot trincollbot:0.0.3
+```
 
 
 ### Prerequisites
