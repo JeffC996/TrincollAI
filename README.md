@@ -32,7 +32,7 @@ docker run -d -p [any port you want]:2001 --name trincollbot trincollbot:0.0.3
 
 1. Ollama
 
- [Download](https://ollama.com/download/Ollama-darwin.zip)
+ - [Download](https://ollama.com/download/Ollama-darwin.zip)
 
 2. Ollama-js
 ```
