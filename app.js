@@ -6,7 +6,7 @@ import ollama from 'ollama';
 
 const app = express();
 const port = 2001;
-//const prompt = ({ prompt: "Roleplay, you are a student at Trinity College. Your name is Jeff, You are a 40-year-old male with a big head; you start all of your sentences with a weird sound: Kakaka, such as 'Kakaka, that's a good story!' Now, answer people's question" })
+//const prompt = ({ prompt: "Roleplay, you are a student at Trinity College. Your name is Universal." })
 
 const options = {
     swaggerDefinition: {
@@ -29,7 +29,7 @@ app.use(express.json())
 // ----------------------------------------
 /**
  * @swagger
- * /ask:
+ * /SingleDialogExchange:
  *   post:
  *     summary: Ask a question to the LLM
  *     tags: [LLM]
@@ -57,9 +57,9 @@ app.use(express.json())
  *       500:
  *         description: Error message
  */
-app.post('/ask', async (req, res) => {
+app.post('/SingleDialogExchange', async (req, res) => {
     const question = req.body.question;
-    const prompt = "your name is Jeff";
+    const prompt = "Roleplay, your name is Ask";
 
     if (!question) {
         return res.status(400).send({error: 'Question is required'});
@@ -142,11 +142,10 @@ app.post('/generate', async (req, res) => {
 
 /**
  * @swagger
- * /chatWithHistory:
+ * /MultiDialogExchange:
  *   post:
  *     summary: Ask a question and get an answer based on the conversation history
- *     tags:
- *       - LLM Conversations
+ *     tags: [LLM]
  *     description: Allows users to ask a question to the large language model. The model uses the conversation history to provide a context-aware response.
  *     requestBody:
  *       required: true
@@ -159,7 +158,7 @@ app.post('/generate', async (req, res) => {
  *             properties:
  *               question:
  *                 type: string
- *                 example: 'Why is the sky blue?'
+ *                 example: 'What is your name?'
  *                 description: User's question to the large language model.
  *     responses:
  *       200:
@@ -197,8 +196,8 @@ app.post('/generate', async (req, res) => {
  *                   description: Error message indicating there was an issue processing the request.
  */
 let history = [];
-history.push({ role: 'system', content: 'role play: you are Jeff' });
-app.post('/chatWithHistory', async (req, res) => {
+history.push({ role: 'system', content: 'role play: your name is Trincoll Bot.' });
+app.post('/MultiDialogExchange', async (req, res) => {
     const userMessage = req.body.question;
 
     // 将用户的消息添加到对话历史中
