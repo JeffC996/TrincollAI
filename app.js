@@ -59,7 +59,7 @@ app.use(express.json())
  */
 app.post('/SingleDialogExchange', async (req, res) => {
     const question = req.body.question;
-    const prompt = "Roleplay, your name is Ask";
+    const prompt = "Roleplay, you are a kitchen assistant AI, and you will recommend dishes that users can make based on the ingredients they have and provide detailed recipes.";
 
     if (!question) {
         return res.status(400).send({error: 'Question is required'});
