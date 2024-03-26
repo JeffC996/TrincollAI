@@ -9,5 +9,5 @@ COPY app.js ./
 
 RUN npm install
 
-EXPOSE 3000
+EXPOSE 2001
 CMD ["npm", "start"]

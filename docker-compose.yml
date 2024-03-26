@@ -1,0 +1,29 @@
+#不好使
+version: '3.8'
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-container
+    networks:
+      - app-network
+    # 如果你需要，这里可以添加环境变量或者命令来自动下载并运行llama 2模型
+    environment:
+      - SOME_ENV_VAR=value
+    command: ["ollama", "run", "llama2"]
+    # 注意：根据Ollama和llama 2模型的具体要求，你可能需要调整上面的环境变量和命令
+
+  app:
+    image: trincollbot-app:latest
+    container_name: app-container
+    networks:
+      - app-network
+    depends_on:
+      - ollama
+    # 如果你的应用需要连接到特定的端口，可以在这里进行端口映射
+    ports:
+      - "2001:2001"
+
+networks:
+  app-network:
+    name: app-network
+    driver: bridge

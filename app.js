@@ -59,7 +59,7 @@ app.use(express.json())
  */
 app.post('/SingleDialogExchange', async (req, res) => {
     const question = req.body.question;
-    const prompt = "Role: kitchen assistant AI. Traits: Recommend recipe that can be cooked according to the ingredients the user has. Style: Succinct, detailed, formal. Scenario: Recommend recipe on an online forum. Example dialogue: User: I have two eggs. kitchen assistant AI: Great!  With two eggs, there are plenty of delicious dishes you can create.  Here are some recommendations:\n\n1.  Scrambled Eggs: This classic breakfast option is easy to make and can be customized with your choice of seasonings and toppings.  Simply crack the eggs into a bowl, beat them together with a fork or whisk, and heat them in a pan over medium heat until they're cooked to your desired doneness.  Serve with toast, hash browns, or your favorite breakfast meats.\n2.  Fried Eggs: If you want to add a crispy, golden-brown element to your breakfast, try frying the eggs in a pan with some oil or butter.  Crack the eggs into the pan and cook them until the whites are set and the yolks are cooked to your desired doneness.  Serve with toast or hash browns.\n3.  Egg Salad: If you want a dish that can be prepared ahead of time, try making an egg salad.  Chop the eggs into small pieces and mix them with mayonnaise, mustard, and any other desired seasonings.  Serve on bread, crackers, or as a topping for a salad.\n4.  Omelette: An omelette is a versatile dish that can be filled with almost any ingredient you like.  Beat the eggs together with salt, pepper, and any other desired seasonings, then add your choice of fillings (such as cheese, vegetables, or meats) to one half of the egg.  Fold the other half over the filling to create a half-circle shape, and cook until the eggs are set. \n\nI hope these recommendations help inspire you to create a delicious dish with your two eggs!";
+    const prompt = "Role: kitchen assistant AI. Traits: Recommend recipe that can be cooked according to the ingredients the user has. Scenario: Recommend recipe on an online forum. Example dialogue: User: I have two eggs. kitchen assistant AI: Recommended dish: Fried Eggs; Time required: 5 minus; Ingredients: one or more eggs. Directions: Step 1: In a small nonstick over medium heat, melt butter (or heat oil). Crack egg into pan. Cook 3 minutes, or until white is set. Step 2: Flip and cook 2 to 3 minutes more, until yolk is completely set";
 
     //"Roleplay, you are a kitchen assistant AI, and you will recommend dishes that users can make based on the ingredients they have and provide detailed recipes."
     if (!question) {
@@ -67,7 +67,6 @@ app.post('/SingleDialogExchange', async (req, res) => {
     }
 
     try {
-        const fullPrompt = prompt + question;
         const response = await ollama.chat({
             model: 'llama2', 
             messages: [{role: 'user', content: fullPrompt}],
@@ -198,7 +197,7 @@ app.post('/generate', async (req, res) => {
  */
 let history_a = [];
 let history = [];
-history.push({ role: 'system', content: 'role play: your name is Trincoll Bot.' });
+history.push({ role: 'system', content: 'Role: kitchen assistant AI. Traits: Recommend recipe that can be cooked according to the ingredients the user has. Scenario: Recommend recipe on an online forum. Example dialogue: User: I have two eggs. kitchen assistant AI: Recommended dish: Fried Eggs; Time required: 5 minus; Ingredients: one or more eggs. Directions: Step 1: In a small nonstick over medium heat, melt butter (or heat oil). Crack egg into pan. Cook 3 minutes, or until white is set. Step 2: Flip and cook 2 to 3 minutes more, until yolk is completely set' });
 app.post('/MultiDialogExchange', async (req, res) => {
     const userMessage = req.body.question;
 
@@ -218,6 +217,90 @@ app.post('/MultiDialogExchange', async (req, res) => {
         history_a.push({ role: 'assistant', content: response.message.content });
 
         // 发送回复给用户
+        res.send({answer: response.message.content});
+    } catch (error) {
+        console.error('Error during LLM interaction:', error);
+        res.status(500).send({error: 'Failed to interact with LLM'});
+    }
+});
+
+// ---------------------------------------- Kitchen assistant Ai
+/**
+ * @swagger
+ * /KitchenAssistant:
+ *   post:
+ *     summary: Continuous dialogue with LLM
+ *     tags: [415-1 Group Project]
+ *     description: API for getting recipe recommendations based on provided ingredients.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - question
+ *             properties:
+ *               question:
+ *                 type: string
+ *                 example: 'I have two eggs'
+ *                 description: Ingredients info.
+ *     responses:
+ *       200:
+ *         description: Successfully received an answer from the large language model.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 answer:
+ *                   type: string
+ *                   example: 'I would recommend XXX... '
+ *                   description: The recipe recommendations generated by LLM
+ *       400:
+ *         description: Bad request, such as when the required "question" field is missing.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: 'Question is required'
+ *                   description: Error message indicating the nature of the request error.
+ *       500:
+ *         description: Internal server error, for example, when there is a failure in interacting with the large language model.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: 'Failed to interact with LLM'
+ *                   description: Error message indicating there was an issue processing the request.
+ */
+app.post('/KitchenAssistant', async (req, res) => {
+    const question = req.body.question; // This line was missing, which is necessary to read the question from the request body
+
+    if (!question) {
+        return res.status(400).send({error: 'Question is required'});
+    }
+
+    try {
+        const response = await ollama.chat({
+            model: 'llama2', 
+            messages: [
+                { 
+                    role: 'system', 
+                    content: 'Role: kitchen assistant AI. Traits: Recommend recipe that can be cooked according to the ingredients the user has. Scenario: Recommend recipe on an online forum. Example dialogue: User: I have two eggs. kitchen assistant AI: Recommended dish: Fried Eggs; Time required: 5 minus; Ingredients: one or more eggs. Directions: Step 1: In a small nonstick over medium heat, melt butter (or heat oil). Crack egg into pan. Cook 3 minutes, or until white is set. Step 2: Flip and cook 2 to 3 minutes more, until yolk is completely set' 
+                },
+                {
+                    role: 'user', 
+                    content: question // Fixed the typo here
+                }
+            ],
+        });
         res.send({answer: response.message.content});
     } catch (error) {
         console.error('Error during LLM interaction:', error);
