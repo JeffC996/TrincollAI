@@ -4,9 +4,11 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import ollama from 'ollama';
 
+
+
 const app = express();
 const port = 2001;
-//const prompt = ({ prompt: "Roleplay, you are a student at Trinity College. Your name is Universal." })
+
 
 const options = {
     swaggerDefinition: {
