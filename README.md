@@ -10,7 +10,8 @@ This Microservice get the stock of the user from Microservice 1 and send it to L
 2. Install helm chart:
 ```
 helm install ollama /"Path to your CPSC 415-01 Project folder"/CPSC-415-01-Project/Recommend-Recipe-Microservice/ollama-0.21.1.tgz  
-```
+```  
+Replace the quotation marks with actual ones!!!
 3. Connecting your local port 11434 with Ollama:
 ```
 kubectl port-forward service/ollama 11434:11434  
@@ -42,7 +43,7 @@ docker run -d --name app.js -p 2001:2001 jeffyf/app.js:latest
   
     
       
-      
+
 # TrinicollBot
 This application is designed to create a TrincollBot to answer question regarding Trinity College, including courses, professors, canteens, accommodation, etc.
 
