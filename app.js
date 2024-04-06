@@ -62,7 +62,7 @@ app.use(express.json())
 app.post('/SingleDialogExchange', async (req, res) => {
     const question = req.body.question;
     const prompt = "Role: kitchen assistant AI. Traits: Recommend recipe that can be cooked according to the ingredients the user has. Scenario: Recommend recipe on an online forum. Example dialogue: User: I have two eggs. kitchen assistant AI: Recommended dish: Fried Eggs; Time required: 5 minus; Ingredients: one or more eggs. Directions: Step 1: In a small nonstick over medium heat, melt butter (or heat oil). Crack egg into pan. Cook 3 minutes, or until white is set. Step 2: Flip and cook 2 to 3 minutes more, until yolk is completely set";
-
+    const promptPlusQuestion = question + prompt;
     //"Roleplay, you are a kitchen assistant AI, and you will recommend dishes that users can make based on the ingredients they have and provide detailed recipes."
     if (!question) {
         return res.status(400).send({error: 'Question is required'});
@@ -71,7 +71,7 @@ app.post('/SingleDialogExchange', async (req, res) => {
     try {
         const response = await ollama.chat({
             model: 'llama2', 
-            messages: [{role: 'user', content: fullPrompt}],
+            messages: [{role: 'user', content: promptPlusQuestion}],
         });
         res.send({answer: response.message.content});
     } catch (error) {

@@ -55,8 +55,9 @@ This application is designed to create a TrincollBot to answer question regardin
 
 
 ## Getting Started
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.  
 
+IMPORTANT: The node version must be 20.11.0 or later!
 1. 
 ```
 node app.js  
