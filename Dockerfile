@@ -1,5 +1,5 @@
 # 1. base
-FROM node:16.20.2
+FROM node:20.11.0
 
 # 2. add some opeartions based on base
 WORKDIR /app
