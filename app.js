@@ -2,13 +2,16 @@
 import express from 'express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import ollama from 'ollama';
-
-
+import { Ollama } from 'ollama'; //
 
 const app = express();
 const port = 2001;
 
+//change the host to the address of Ollama in K8s
+const ollama = new Ollama({
+    host: 'http://ollama.default.svc.cluster.local:11434'
+  });
+  
 
 const options = {
     swaggerDefinition: {

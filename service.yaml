@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jeffyf-app-service
+spec:
+  selector:
+    app: jeffyf-app
+  ports:
+    - protocol: TCP
+      port: 2001
+      targetPort: 2001

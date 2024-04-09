@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jeffyf-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jeffyf-app
+  template:
+    metadata:
+      labels:
+        app: jeffyf-app
+    spec:
+      containers:
+      - name: jeffyf-app
+        image: jeffyf/app.js
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 2001
