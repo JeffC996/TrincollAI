@@ -1,0 +1,19 @@
+{
+  "name": "generating-shopping-list-microservice",
+  "version": "1.0.0",
+  "description": "This microservice retrieves the user's stock from Microservice 1 and the saved recipes from Microservice 2, generating a JSON-formatted list of missing items based on this information. It then sends this list to [Spoonacular API-Compute Shopping List](https://spoonacular.com/food-api/docs#Compute-Shopping-List) to generate a comprehensive shopping list that includes each item's aisle, name, measures, and cost.",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "JeffC",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.8",
+    "express": "^4.19.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
+  }
+}
