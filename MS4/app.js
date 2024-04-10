@@ -136,6 +136,6 @@ async function sendToExternalAPI(data) {
   
 
   app.listen(process.env.PORT || 2002, () => {
-    console.log(`服务器正在运行，端口为 ${process.env.PO√RT || 2002}`);
+    console.log(`服务器正在运行，端口为 ${process.env.PORT || 2002}`);
   });
   
