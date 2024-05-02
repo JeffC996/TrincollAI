@@ -11,9 +11,10 @@ const port = 2001;
 
 //change the host to the address of Ollama in K8s
 const ollama = new Ollama({
-    host: 'http://ollama.default.svc.cluster.local:11434' //
+  host: 'http://ollama.krx-ollama-helm.svc.cluster.local:11434'
+    //host: 'http://ollama.default.svc.cluster.local:11434' //
     // host: 'http://10.101.165.41:11434'
-  });
+});
 
 const options = {
     swaggerDefinition: {
