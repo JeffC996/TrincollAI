@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: recommend-recipe-ms-service
+  namespace: krx-recommend-recipe-ms
+  labels:
+    app: ms3-service
+spec:
+  type: ClusterIP
+  selector:
+    app: ms3
+  ports:
+    - name: ms3-port
+      port: 2001
+      targetPort: ms3-port

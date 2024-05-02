@@ -1,0 +1,6 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: krx-kitchen-inventory-ms
+  labels:
+    name: krx-kitchen-inventory-ms

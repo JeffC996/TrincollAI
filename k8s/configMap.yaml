@@ -1,0 +1,8 @@
+# All MSs suppose to share this configMap file. Defines all env and base URL here
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: krx-config
+env:
+  - name: krx-kitchen-inventory-ms
+    value: "http://kitchen-inventory-ms-service.krx-kitchen-inventory-ms:8080"

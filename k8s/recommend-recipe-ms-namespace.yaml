@@ -1,0 +1,6 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: krx-recommend-recipe-ms
+  labels:
+    name: krx-recommend-recipe-ms
