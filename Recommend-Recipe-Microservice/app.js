@@ -87,7 +87,7 @@ app.post('/kitchenAssistant1', async (req, res) => {
 
       
         const response = await ollama.chat({
-            model: 'llama2', 
+            model: 'mistral', 
             messages: [
                 { 
                     role: 'system', 
