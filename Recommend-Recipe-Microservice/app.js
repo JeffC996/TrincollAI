@@ -19,9 +19,9 @@ const ollama = new Ollama({
   
 // 配置 OpenAI 客户端
 
-
+const openaiApiKey = process.env.OPENAI_API_KEY; // 从环境变量中读取 API Key
   const openai = new OpenAI({
-    apiKey: 'sk-proj-8y05OYujX03FNnbFsNNcT3BlbkFJRoaQw45UyUQ89dRqtJ4h',
+    apiKey: openaiApiKey,
   });
 
 
@@ -111,7 +111,7 @@ app.use(express.json());
  *           description: The ingredient unit
  */
 const API_KEY = '87047dd829384f268646bb188a73ccb7';
-
+//const spoonacularApiKey = process.env.SPOONACULAR_API_KEY;
 app.post('/getRandomRecipes', async (req, res) => {
   try {
     const apiResponse = await getRandomRecipes();
@@ -123,7 +123,7 @@ app.post('/getRandomRecipes', async (req, res) => {
 });
 
 async function getRandomRecipes() {
-  const apiUrl = `https://api.spoonacular.com/recipes/random?apiKey=${API_KEY}`;
+  const apiUrl = `https://api.spoonacular.com/recipes/random?apiKey=${API_KEY}`;//next step: spoonacularApiKey
   
   try {
     const response = await axios.get(apiUrl, {
