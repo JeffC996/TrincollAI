@@ -8,7 +8,6 @@ import OpenAI from 'openai';
 
 const app = express();
 const port = 2001;
-const specs = swaggerJsdoc(options)
 //Ollama
 const ollama = new Ollama({
     host: 'http://ollama.krx-ollama-helm:11434'
@@ -40,6 +39,7 @@ const options = {
     },
     apis: ['./app.js'],
 }
+const specs = swaggerJsdoc(options)
 
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(specs));
 app.use(express.json());
