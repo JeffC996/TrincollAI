@@ -183,14 +183,14 @@ async function getRandomRecipes() {
  */
 app.post('/openaiRecipe1', async (req, res) => {
     const ms1Url = 'http://kitchen-inventory-ms-service.krx-kitchen-inventory-ms.svc.cluster.local:8080/kitchenItems';
-  
+    const ms1Response = await axios.get(ms1Url);
     try {
       // 获取厨房库存数据并直接生成 userContent
-      const ms1Response = await axios.get(ms1Url);
-      const userContent = Array.isArray(ms1Response.data) && ms1Response.data.length > 0
+      
+      /*const userContent = Array.isArray(ms1Response.data) && ms1Response.data.length > 0
         ? `Ingredients: ${ms1Response.data.map(item => item.name).join(', ')}.`
-        : 'Your fridge is empty!';
-  
+        : 'Your fridge is empty!';*/
+      const userContent = ms1Response && ms1Response.length > 0 ? `Ingredients: ${ms1Response.join(', ')}.` : '两个鸡蛋。';
       // 构建 OpenAI API 请求
       const chatCompletion = await openai.chat.completions.create({
         messages: [
