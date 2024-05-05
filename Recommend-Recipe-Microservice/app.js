@@ -11,10 +11,28 @@ const port = 2001;
 
 //change the host to the address of Ollama in K8s
 const ollama = new Ollama({
-  host: 'http://ollama.krx-ollama-helm.svc.cluster.local:11434'
+    host: 'http://ollama.krx-ollama-helm:11434'
     //host: 'http://ollama.default.svc.cluster.local:11434' //
     // host: 'http://10.101.165.41:11434'
+  });
+
+
+
+
+//////////////////
+import OpenAI from 'openai';
+
+// 配置 OpenAI 客户端
+const openai = new OpenAI({
+    apiKey: 'sk-proj-0FiXrOD70NRmBYBR1IRbT3BlbkFJvADdeUBXWFpsErCaEbKe' // 使用你的硬编码 API 密钥
 });
+
+
+////////////////////////
+
+
+
+
 
 const options = {
     swaggerDefinition: {
@@ -34,77 +52,6 @@ app.use(express.json());
 
 
 //----------------------
-
-/**
- * @swagger
- * /kitchenAssistant1:
- *   post:
- *     summary: Retrieve a recipe based on kitchen inventory
- *     tags: [Production API]
- *     description: This endpoint retrieves kitchen inventory items from Microservice 1 and uses them to request a recipe recommendation from the Ollama language model.
- *     responses:
- *       200:
- *         description: Successfully retrieved a recipe recommendation based on the current kitchen inventory.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 answer:
- *                   type: string
- *                   description: Recipe recommendation based on the kitchen inventory data retrieved.
- *                   example: "Recommended dish: Fried Eggs; Time required: 5 minutes; Ingredients needed: two eggs."
- *       400:
- *         description: Bad request, for example, if the kitchen inventory data is incomplete or missing.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Error message indicating the request could not be processed due to missing or incomplete data.
- *                   example: "Invalid data from kitchen inventory service"
- *       500:
- *         description: Internal server error, typically when there is a failure in interacting with the Ollama language model or the microservice.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Error message indicating there was an issue processing the request.
- *                   example: "Failed to interact with LLM or retrieve data from microservice"
- */
-
-app.post('/kitchenAssistant1', async (req, res) => {
-    const ms1Url = 'http://kitchen-inventory-ms-service.krx-kitchen-inventory-ms.svc.cluster.local:8080/kitchenItems';
-    try {
-        const ms1Response = await axios.get(ms1Url);
-        const kitchenItems = JSON.stringify(ms1Response.data); // 将获取的数据转换成字符串
-
-
-      
-        const response = await ollama.chat({
-            model: 'llama2', 
-            messages: [
-                { 
-                    role: 'system', 
-                    content: 'Role: AI Chef. Traits: Recommend recipe that can be cooked according to the ingredients the user has. Scenario: Given the following list of ingredients available in an inventory, recommend a single dish that can be prepared using these items. Provide a detailed, step-by-step recipe for creating the dish, ensuring that each instruction is clear and thorough for someone who might be a beginner in the kitchen.' 
-                },
-                {
-                    role: 'user', 
-                    content: kitchenItems // 将食材描述发送到OLLAMA
-                }
-            ],
-        });
-        res.send({answer: response.message.content});
-    } catch (error) {
-        console.error('Error during network or LLM interaction:', error);
-        res.status(500).send({error: 'Failed to interact with LLM or fetch data'});
-    }
-});
 
 //----------------------
 /**
@@ -215,7 +162,84 @@ async function getRandomRecipes() {
     throw error;
   }
 }
-// ---------------------------------------- For Testing purpose
+
+/**
+ * @swagger
+ * /openaiRecipe:
+ *   post:
+ *     summary: Generate a recipe using the OpenAI GPT model
+ *     tags: [Production API]
+ *     description: Retrieve the user's kitchen inventory data and generate a recommended recipe using the OpenAI GPT model.
+ *     responses:
+ *       200:
+ *         description: Successfully generated and retrieved the recommended recipe.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 recipe:
+ *                   type: string
+ *                   description: The content of the recommended recipe
+ *                   example: "Recommended dish: Pasta. Ingredients needed: tomatoes, pasta. Instructions: Step 1..."
+ *       400:
+ *         description: Missing or malformed request parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: 'Invalid data from kitchen inventory service'
+ *                   description: Incorrect request parameters provided.
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: 'Failed to interact with OpenAI'
+ *                   description: Error while interacting with the OpenAI service.
+ */
+
+app.post('/openaiRecipe', async (req, res) => {
+  const ms1Url = 'http://kitchen-inventory-ms-service.krx-kitchen-inventory-ms.svc.cluster.local:8080/kitchenItems';
+  try {
+      // 获取来自其他微服务的厨房库存数据
+      const ms1Response = await axios.get(ms1Url);
+      const kitchenItems = JSON.stringify(ms1Response.data); // 将获取的数据转换成字符串
+
+      // 构建 OpenAI API 请求
+      const response = await openai.createChatCompletion({
+          model: 'gpt-4',
+          messages: [
+              {
+                  role: 'system',
+                  content: 'You are an AI kitchen assistant who provides recipes based on available ingredients.'
+              },
+              {
+                  role: 'user',
+                  content: `Given the following kitchen inventory: ${kitchenItems}, recommend a dish and provide a step-by-step recipe.`
+              }
+          ]
+      });
+
+      // 返回生成的菜谱
+      const generatedRecipe = response.data.choices[0].message.content;
+      res.json({ recipe: generatedRecipe });
+  } catch (error) {
+      console.error('Failed to interact with OpenAI:', error);
+      res.status(500).json({ error: 'Failed to interact with OpenAI' });
+  }
+});
+
+
+
+// ----------------------------------------------------------------------------------- For Testing purpose
 /**
  * @swagger
  * /KitchenAssistant:
@@ -350,6 +374,78 @@ app.post('/MS1Response', async (req, res) => {
     }
 });
 
+//----------------------------------------------------
+
+/**
+ * @swagger
+ * /kitchenAssistant1:
+ *   post:
+ *     summary: Retrieve a recipe based on kitchen inventory
+ *     tags: [Testing API]
+ *     description: This endpoint retrieves kitchen inventory items from Microservice 1 and uses them to request a recipe recommendation from the Ollama language model.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved a recipe recommendation based on the current kitchen inventory.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 answer:
+ *                   type: string
+ *                   description: Recipe recommendation based on the kitchen inventory data retrieved.
+ *                   example: "Recommended dish: Fried Eggs; Time required: 5 minutes; Ingredients needed: two eggs."
+ *       400:
+ *         description: Bad request, for example, if the kitchen inventory data is incomplete or missing.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating the request could not be processed due to missing or incomplete data.
+ *                   example: "Invalid data from kitchen inventory service"
+ *       500:
+ *         description: Internal server error, typically when there is a failure in interacting with the Ollama language model or the microservice.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating there was an issue processing the request.
+ *                   example: "Failed to interact with LLM or retrieve data from microservice"
+ */
+
+app.post('/kitchenAssistant1', async (req, res) => {
+  const ms1Url = 'http://kitchen-inventory-ms-service.krx-kitchen-inventory-ms.svc.cluster.local:8080/kitchenItems';
+  try {
+      const ms1Response = await axios.get(ms1Url);
+      const kitchenItems = JSON.stringify(ms1Response.data); // 将获取的数据转换成字符串
+
+
+    
+      const response = await ollama.chat({
+          model: 'llama2', 
+          messages: [
+              { 
+                  role: 'system', 
+                  content: 'Role: AI Chef. Traits: Recommend recipe that can be cooked according to the ingredients the user has. Scenario: Given the following list of ingredients available in an inventory, recommend a single dish that can be prepared using these items. Provide a detailed, step-by-step recipe for creating the dish, ensuring that each instruction is clear and thorough for someone who might be a beginner in the kitchen.' 
+              },
+              {
+                  role: 'user', 
+                  content: kitchenItems // 将食材描述发送到OLLAMA
+              }
+          ],
+      });
+      res.send({answer: response.message.content});
+  } catch (error) {
+      console.error('Error during network or LLM interaction:', error);
+      res.status(500).send({error: 'Failed to interact with LLM or fetch data'});
+  }
+});
 
 //--------------
 app.listen(port, () => {
