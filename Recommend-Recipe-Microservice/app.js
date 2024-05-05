@@ -52,7 +52,8 @@ app.use(express.json());
  * /getRandomRecipes:
  *   post:
  *     summary: Get a random recipe from the Spoonacular API
- *     tags: [Production API]
+ *     tags:
+ *       - Production API
  *     description: Get a random recipe based on fixed parameters.
  *     responses:
  *       200:
@@ -163,6 +164,8 @@ async function getRandomRecipes() {
  * /openaiRecipe1:
  *   post:
  *     summary: Generate a recipe using OpenAI and ingredients from the kitchen inventory service
+ *     tags:
+ *       - Production API
  *     description: Fetches kitchen inventory data from another service, and uses OpenAI to generate a recipe based on the available ingredients.
  *     responses:
  *       200:
@@ -219,7 +222,8 @@ app.post('/openaiRecipe1', async (req, res) => {
  * /KitchenAssistant:
  *   post:
  *     summary: single dialogue with LLM
- *     tags: [Testing API]
+ *     tags:
+ *       - Testing API
  *     description: API for getting recipe recommendations based on provided ingredients by input.
  *     requestBody:
  *       required: true
@@ -304,7 +308,8 @@ app.post('/KitchenAssistant', async (req, res) => {
  * /MS1Response:
  *   post:
  *     summary: Get kitchen items from MS1 service
- *     tags: [Testing API]
+ *     tags:
+ *       - Testing API
  *     description: Retrieve kitchen items from MS1 service and send the data as JSON response
  *     responses:
  *       '200':
@@ -355,7 +360,8 @@ app.post('/MS1Response', async (req, res) => {
  * /kitchenAssistant1:
  *   post:
  *     summary: Retrieve a recipe based on kitchen inventory
- *     tags: [Testing API]
+ *     tags:
+ *       -  Testing API
  *     description: This endpoint retrieves kitchen inventory items from Microservice 1 and uses them to request a recipe recommendation from the Ollama language model.
  *     responses:
  *       200:
@@ -426,7 +432,8 @@ app.post('/kitchenAssistant1', async (req, res) => {
  * /generate:
  *   post:
  *     summary: Generate a recipe based on provided ingredients using gpt-3.5-turbo from external API
- *     tags: [Testing API]
+ *     tags:
+ *       - Testing API
  *     requestBody:
  *       description: A list of ingredients
  *       required: true
