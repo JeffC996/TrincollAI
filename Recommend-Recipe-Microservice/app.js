@@ -183,38 +183,42 @@ async function getRandomRecipes() {
  */
 app.post('/openaiRecipe1', async (req, res) => {
     const ms1Url = 'http://kitchen-inventory-ms-service.krx-kitchen-inventory-ms.svc.cluster.local:8080/kitchenItems';
-    const ms1Response = await axios.get(ms1Url);
     try {
-      // 获取厨房库存数据并直接生成 userContent
-      
-      /*const userContent = Array.isArray(ms1Response.data) && ms1Response.data.length > 0
-        ? `Ingredients: ${ms1Response.data.map(item => item.name).join(', ')}.`
-        : 'Your fridge is empty!';*/
-      const userContent = ms1Response && ms1Response.length > 0 ? `Ingredients: ${ms1Response.join(', ')}.` : '两个鸡蛋。';
-      // 构建 OpenAI API 请求
-      const chatCompletion = await openai.chat.completions.create({
-        messages: [
-          {
-            role: 'system',
-            content: 'Role: kitchen assistant AI. Traits: Recommend recipe that can be cooked according to the ingredients the user has. Scenario: Recommend recipe on an online forum. Example dialogue: User: I have two eggs. Kitchen assistant AI: Recommended dish: Fried Eggs; Time required: 5 minutes; Ingredients: one or more eggs. Directions: Step 1: In a small nonstick over medium heat, melt butter (or heat oil). Crack egg into pan. Cook 3 minutes, or until white is set. Step 2: Flip and cook 2 to 3 minutes more, until yolk is completely set.'
-          },
-          {
-            role: 'user',
-            content: userContent
-          }
-        ],
-        model: 'gpt-3.5-turbo'
-      });
-  
-      // 返回生成的菜谱
-      console.log(JSON.stringify(chatCompletion, null, 2));
-      const generatedText = chatCompletion.choices[0].message.content.trim();
-      res.json({ text: generatedText });
+        // 获取厨房库存数据
+        const ms1Response = await axios.get(ms1Url);
+        console.log('Received data from MS1:', ms1Response.data);
+        
+        // 检查库存数据是否为空或无效
+        const inventory = ms1Response.data;
+        const userContent = Array.isArray(inventory) && inventory.length > 0
+            ? `Ingredients: ${inventory.map(item => item.name).join(', ')}.`
+            : 'Your fridge is empty!';
+
+        // 与 OpenAI 模型交互
+        const chatCompletion = await openai.chat.completions.create({
+            messages: [
+                {
+                    role: 'system',
+                    content: 'Role: kitchen assistant AI. Traits: Recommend recipe that can be cooked according to the ingredients the user has. Scenario: Recommend recipe on an online forum. Example dialogue: User: I have two eggs. Kitchen assistant AI: Recommended dish: Fried Eggs; Time required: 5 minutes; Ingredients: one or more eggs. Directions: Step 1: In a small nonstick over medium heat, melt butter (or heat oil). Crack egg into pan. Cook 3 minutes, or until white is set. Step 2: Flip and cook 2 to 3 minutes more, until yolk is completely set.'
+                },
+                {
+                    role: 'user',
+                    content: userContent
+                }
+            ],
+            model: 'gpt-3.5-turbo'
+        });
+
+        // 获取生成的菜谱
+        console.log('Received OpenAI response:', chatCompletion);
+        const generatedText = chatCompletion.choices[0].message.content.trim();
+        res.json({ text: generatedText });
     } catch (error) {
-      console.error('Error:', error.message, error.response?.data);
-      res.status(500).json({ error: '发生错误' });
+        console.error('Error:', error.message, error.response?.data);
+        res.status(500).json({ error: '发生错误' });
     }
-  });
+});
+
 
 // ----------------------------------------------------------------------------------- For Testing purpose
 /**
