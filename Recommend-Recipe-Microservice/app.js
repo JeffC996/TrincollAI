@@ -8,25 +8,27 @@ import OpenAI from 'openai';
 
 const app = express();
 const port = 2001;
-
-//change the host to the address of Ollama in K8s
+const specs = swaggerJsdoc(options)
+//Ollama
 const ollama = new Ollama({
     host: 'http://ollama.krx-ollama-helm:11434'
     //host: 'http://ollama.default.svc.cluster.local:11434' //
     // host: 'http://10.101.165.41:11434'
   });
-
-  
-// 配置 OpenAI 客户端
-
+  // OpenAI
 const openaiApiKey = process.env.OPENAI_API_KEY; // 从环境变量中读取 API Key
   const openai = new OpenAI({
     apiKey: openaiApiKey,
   });
-
-
-
-
+//Spoonacular API
+const spoonacularApiKey = process.env.SPOONACULAR_API_KEY;
+//Base URL
+const ms1BaseUrl = process.env.MS1_BASE_URL;
+if (!ms1BaseUrl) {
+    console.error('Service URLs are not set.');
+    process.exit(1); // 退出程序，因为缺少必要的配置
+}
+//Swagger
 const options = {
     swaggerDefinition: {
         openapi: '3.0.0',
@@ -39,12 +41,8 @@ const options = {
     apis: ['./app.js'],
 }
 
-const specs = swaggerJsdoc(options)
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(specs));
 app.use(express.json());
-
-
-//----------------------
 
 //----------------------
 /**
@@ -110,8 +108,6 @@ app.use(express.json());
  *           type: string
  *           description: The ingredient unit
  */
-const API_KEY = '87047dd829384f268646bb188a73ccb7';
-//const spoonacularApiKey = process.env.SPOONACULAR_API_KEY;
 app.post('/getRandomRecipes', async (req, res) => {
   try {
     const apiResponse = await getRandomRecipes();
@@ -123,7 +119,7 @@ app.post('/getRandomRecipes', async (req, res) => {
 });
 
 async function getRandomRecipes() {
-  const apiUrl = `https://api.spoonacular.com/recipes/random?apiKey=${API_KEY}`;//next step: spoonacularApiKey
+  const apiUrl = `https://api.spoonacular.com/recipes/random?apiKey=${spoonacularApiKey}`;//next step: spoonacularApiKey
   
   try {
     const response = await axios.get(apiUrl, {
@@ -182,7 +178,8 @@ async function getRandomRecipes() {
  *         description: Server error
  */
 app.post('/openaiRecipe1', async (req, res) => {
-    const ms1Url = 'http://kitchen-inventory-ms-service.krx-kitchen-inventory-ms.svc.cluster.local:8080/kitchenItems';
+    //const ms1Url = 'http://kitchen-inventory-ms-service.krx-kitchen-inventory-ms.svc.cluster.local:8080/kitchenItems';
+    const ms1Url = `${ms1BaseUrl}/kitchenItems`
     try {
         // 获取厨房库存数据
         const ms1Response = await axios.get(ms1Url);
@@ -345,7 +342,6 @@ app.post('/KitchenAssistant', async (req, res) => {
  *                   type: string
  *                   example: "Failed to interact with MS1"
  */
-
 app.post('/MS1Response', async (req, res) => {
     const ms1Url = 'http://kitchen-inventory-ms-service.krx-kitchen-inventory-ms.svc.cluster.local:8080/kitchenItems';
     try {
@@ -357,6 +353,55 @@ app.post('/MS1Response', async (req, res) => {
     }
 });
 
+// ----------------------------------------
+/**
+ * @swagger
+ * /MS1ResponseFromBaseURL:
+ *   post:
+ *     summary: Get kitchen items from MS1 service using Base URL
+ *     tags:
+ *       - Testing API
+ *     description: Retrieve kitchen items from MS1 service and send the data as JSON response
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   name:
+ *                     type: string
+ *                     description: The name of the kitchen item
+ *                   quantity:
+ *                     type: number
+ *                     description: The quantity of the kitchen item
+ *                   unit:
+ *                     type: string
+ *                     description: The unit of measurement of the kitchen item
+ *       '500':
+ *         description: Failed to interact with MS1
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Failed to interact with MS1"
+ */
+app.post('/MS1ResponseFromBaseURL', async (req, res) => {
+    const ms1Url = `${ms1BaseUrl}/kitchenItems`
+    try {
+        const ms1Response = await axios.get(ms1Url);
+        res.send(ms1Response.data); // 直接将获取的数据作为响应发送给客户端
+    } catch (error) {
+        console.error('Error', error);
+        res.status(500).send({error: 'Failed to interact with MS1'});
+    }
+});
 //----------------------------------------------------
 
 /**
